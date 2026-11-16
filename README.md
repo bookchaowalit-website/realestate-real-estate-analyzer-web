@@ -1,6 +1,6 @@
-# Real Estate Analyzer
+# Rental Yield (dashboard)
 
-A client-only property ledger over four hard-coded, synthetic listings. Pick a listing to see its asking price,
+A client-only page over four hard-coded, synthetic listings, built on the Dashboard shell (see `DASHBOARD.md`). Pick a listing to see its asking price,
 monthly rent and gross yield (annual rent / price), and move a down-payment slider (10-80%) to see initial cash,
 annual gross rent and gross payback in years.
 
@@ -21,7 +21,7 @@ npm run dev
 ## Checks
 
 ```bash
-npm test           # Vitest: yield and payback maths, home page render, Sentry scrubbing
+npm test           # Vitest: yield and payback maths, mounted home page tests, the Dashboard shell, Sentry scrubbing
 npm run lint
 npm run typecheck
 npm run build
@@ -34,6 +34,7 @@ scan on every push and PR to `main`.
 
 - `lib/realestate.ts`: the sample listings plus `grossYield`, `computeMetrics`, `yieldBarWidth` and the baht
   formatter (used by the page).
-- `app/page.tsx`: the ledger page (client component).
+- `app/page.tsx`: the page (client component).
+- `app/dashboard-shell.css` + `components/dashboard-shell.tsx`: the copied-in Dashboard shell (`DASHBOARD.md`).
 - `lib/sentry.ts` + `instrumentation*.ts`: error reporting to Sentry, errors only, personal data stripped; off when
   `NEXT_PUBLIC_SENTRY_DSN` is unset.
