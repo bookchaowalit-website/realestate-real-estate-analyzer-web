@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeMetrics, findListing, grossYield, listings, money, yieldBarWidth } from "@/lib/realestate";
+import { computeMetrics, findListing, grossYield, isDownPayment, listings, money, snapDownPayment, yieldBarWidth } from "@/lib/realestate";
 
 describe("listings", () => {
   it("holds four synthetic records and falls back to the first", () => {
@@ -34,17 +34,35 @@ describe("computeMetrics", () => {
 });
 
 describe("yieldBarWidth", () => {
-  it("scales 6.25% to a full bar and clamps both ends", () => {
-    expect(yieldBarWidth(6.25)).toBe(100);
+  it("scales 10% to a full bar and clamps both ends", () => {
+    expect(yieldBarWidth(10)).toBe(100);
     expect(yieldBarWidth(12)).toBe(100);
-    expect(yieldBarWidth(3)).toBe(48);
+    expect(yieldBarWidth(6.25)).toBe(62.5);
+    expect(yieldBarWidth(3)).toBe(30);
     expect(yieldBarWidth(-1)).toBe(0);
   });
 });
 
+describe("down payment input", () => {
+  it("snaps a typed value onto the slider's 10–80 scale in steps of 5", () => {
+    expect(snapDownPayment(33)).toBe(35);
+    expect(snapDownPayment(32)).toBe(30);
+    expect(snapDownPayment(2)).toBe(10);
+    expect(snapDownPayment(500)).toBe(80);
+    expect(snapDownPayment(Number.NaN)).toBe(10);
+  });
+
+  it("accepts only values already on the scale", () => {
+    expect(isDownPayment(45)).toBe(true);
+    expect(isDownPayment(44)).toBe(false);
+    expect(isDownPayment(5)).toBe(false);
+    expect(isDownPayment(Number.NaN)).toBe(false);
+  });
+});
+
 describe("money", () => {
-  it("formats baht without decimals", () => {
-    expect(money.format(3_250_000)).toMatch(/3,250,000/);
-    expect(money.format(3_250_000)).toMatch(/THB|฿/);
+  it("formats baht with the ฿ sign and no decimals", () => {
+    expect(money.format(3_250_000)).toBe("฿3,250,000");
+    expect(money.format(18_500.4)).toBe("฿18,500");
   });
 });
