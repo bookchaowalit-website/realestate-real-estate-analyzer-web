@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { DashFoot, DashTop, Pill, Stat } from "@/components/dashboard-shell";
 import { DOWN_PAYMENT, computeMetrics, findListing, grossYield, listings, money, yieldBarWidth } from "@/lib/realestate";
+
+const baht = (n: number) => Math.round(n).toLocaleString("en-US");
 
 export default function Home() {
   const [selectedId, setSelectedId] = useState("river");
@@ -10,19 +13,76 @@ export default function Home() {
   const metrics = useMemo(() => computeMetrics(selected, downPayment), [downPayment, selected]);
 
   return (
-    <main className="ledger-page">
-      <div className="ledger-frame">
-        <header className="ledger-masthead"><span className="ledger-mark">RA / 01</span><span>PROPERTY DECISION DESK</span><span className="ledger-status"><i /> SYNTHETIC LEDGER</span></header>
-        <section className="ledger-hero"><div><p className="ledger-kicker">compare the number behind the feeling</p><h1>Find the<br /><em>yield line.</em></h1><p className="ledger-deck">A small property ledger for comparing asking price, monthly rent, and the time your cash stays in the building.</p></div><div className="ledger-stamp"><span>NOT A LISTING FEED</span><strong>04</strong><small>sample records<br />for study</small></div></section>
+    <div className="ds">
+      <a className="ds-skip" href="#main">Skip to content</a>
+      <DashTop name="Rental yield" tagline="Four sample listings" />
 
-        <section className="ledger-workbench" aria-label="Property comparison workspace">
-          <aside className="property-index"><div className="section-label"><span>INDEX</span><span>{listings.length} records</span></div>{listings.map((listing, index) => <button type="button" key={listing.id} className={`property-row ${selected.id === listing.id ? "is-active" : ""}`} onClick={() => setSelectedId(listing.id)}><span className="row-number">0{index + 1}</span><span><strong>{listing.name}</strong><small>{listing.district} · {listing.type}</small></span><b>{grossYield(listing).toFixed(1)}%</b></button>)}</aside>
-          <article className="property-sheet"><div className="sheet-top"><div><p className="section-label">SELECTED RECORD</p><h2>{selected.name}</h2><p>{selected.district} / {selected.type} / {selected.area} m²</p></div><span className="sheet-id">{selected.id.toUpperCase()}</span></div><div className="number-grid"><div><span>ASKING PRICE</span><strong>{money.format(selected.price)}</strong></div><div><span>MONTHLY RENT</span><strong>{money.format(selected.rent)}</strong></div><div className="number-accent"><span>GROSS YIELD</span><strong>{metrics.yieldRate.toFixed(2)}%</strong></div></div><div className="sheet-note"><span>FIELD NOTE</span><p>{selected.note}</p></div><div className="yield-bar" role="img" aria-label={`${metrics.yieldRate.toFixed(2)} percent gross yield`}><span style={{ width: `${yieldBarWidth(metrics.yieldRate)}%` }} /></div><p className="yield-caption">Annual gross rent / asking price · ignores vacancy, financing, fees, tax, and maintenance.</p></article>
-        </section>
+      <main id="main" tabIndex={-1} className="ds-main">
+        <div className="ds-head">
+          <div>
+            <h1>Rental yield</h1>
+            <p>{selected.name} · gross figures in THB <Pill tone="grey">Sample data</Pill></p>
+          </div>
+        </div>
 
-        <section className="scenario" aria-labelledby="scenario-title"><div className="scenario-heading"><p className="section-label">SCENARIO / CASH AT RISK</p><h2 id="scenario-title">Move the deposit, keep the record.</h2><p>See how the headline payback changes when your initial cash changes.</p></div><label className="range-field"><span>DOWN PAYMENT <b>{downPayment}%</b></span><input type="range" min={DOWN_PAYMENT.min} max={DOWN_PAYMENT.max} step={DOWN_PAYMENT.step} value={downPayment} onChange={(event) => setDownPayment(Number(event.target.value))} /></label><dl className="scenario-output"><div><dt>INITIAL CASH</dt><dd>{money.format(metrics.cash)}</dd></div><div><dt>ANNUAL GROSS</dt><dd>{money.format(metrics.gross)}</dd></div><div><dt>GROSS PAYBACK</dt><dd>{metrics.payback.toFixed(1)} yrs</dd></div></dl></section>
-        <footer className="ledger-footer"><span>BOOKCHAOWALIT / REAL ESTATE ANALYZER</span><span>DEMO DATA · NO BROKER OR INVESTMENT ADVICE</span></footer>
-      </div>
-    </main>
+        <ul className="ds-stats" aria-label={`${selected.name} at a glance`}>
+          <Stat label="Asking price" value={baht(selected.price)} unit="THB" note={`${selected.area} m²`} />
+          <Stat label="Monthly rent" value={baht(selected.rent)} unit="THB" note={`${money.format(metrics.gross)} a year`} />
+          <Stat label="Gross yield" value={`${metrics.yieldRate.toFixed(2)}%`} note="yearly rent ÷ price" />
+          <Stat label="Gross payback" value={metrics.payback.toFixed(1)} unit="yrs" note={`on ${downPayment}% down`} />
+        </ul>
+
+        <div className="ds-grid">
+          <section className="ds-panel" aria-labelledby="scenario-heading">
+            <div className="ds-panel-head">
+              <div>
+                <h2 id="scenario-heading">Down payment</h2>
+                <p>How long your first cash takes to come back as gross rent</p>
+              </div>
+            </div>
+            <div className="ds-form">
+              <label className="ds-field">
+                <span className="ds-field-row">Share of the price paid up front <b>{downPayment}%</b></span>
+                <input className="ds-range" type="range" min={DOWN_PAYMENT.min} max={DOWN_PAYMENT.max} step={DOWN_PAYMENT.step} value={downPayment} onChange={(event) => setDownPayment(Number(event.target.value))} />
+              </label>
+              <ul className="ds-rows">
+                <li className="ds-row"><span className="ds-row-name">Initial cash</span><span className="ds-row-detail">{downPayment}% of {money.format(selected.price)}</span><span className="ds-row-value">{money.format(metrics.cash)}</span></li>
+                <li className="ds-row"><span className="ds-row-name">Annual gross rent</span><span className="ds-row-detail">{money.format(selected.rent)} × 12</span><span className="ds-row-value">{money.format(metrics.gross)}</span></li>
+                <li className="ds-row"><span className="ds-row-name">Gross payback</span><span className="ds-row-detail">initial cash ÷ annual gross rent</span><span className="ds-row-value">{metrics.payback.toFixed(1)} yrs</span></li>
+              </ul>
+            </div>
+            <div className="ds-callout" aria-live="polite">
+              <strong>{selected.name}</strong>
+              <span>{selected.district} · {selected.type} · {selected.area} m². {selected.note}</span>
+            </div>
+          </section>
+
+          <section className="ds-panel" aria-labelledby="listings-heading">
+            <div className="ds-panel-head">
+              <div>
+                <h2 id="listings-heading">Listings</h2>
+                <p>Gross yield; the bar is full at 6.25%</p>
+              </div>
+            </div>
+            <ul className="ds-rows">
+              {listings.map((listing) => (
+                <li key={listing.id}>
+                  <button type="button" className="ds-row" aria-pressed={listing.id === selected.id} onClick={() => setSelectedId(listing.id)}>
+                    <span className="ds-row-name">{listing.name}</span>
+                    <span className="ds-row-detail">{listing.district} · {listing.type}</span>
+                    <span className="ds-row-value">{grossYield(listing).toFixed(1)}%</span>
+                    <span className="ds-meter" aria-hidden="true"><span style={{ width: `${yieldBarWidth(grossYield(listing))}%` }} /></span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+
+        <p className="ds-note">Four synthetic listings, not a listing feed. Gross figures only: vacancy, financing, fees, tax and maintenance are left out. Not broker or investment advice.</p>
+      </main>
+
+      <DashFoot source="https://github.com/bookchaowalit-website/realestate-real-estate-analyzer-web" />
+    </div>
   );
 }
