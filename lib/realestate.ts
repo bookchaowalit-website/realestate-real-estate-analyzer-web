@@ -9,7 +9,8 @@ export const listings: Listing[] = [
   { id: "east-market", district: "East Market", name: "Market Court", type: "Shop-house", price: 6750000, rent: 36000, area: 124, note: "Commercial frontage; higher upkeep." },
 ];
 
-export const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "THB", maximumFractionDigits: 0 });
+// Thai baht with the ฿ sign (narrowSymbol), e.g. ฿3,250,000; the page copy stays English.
+export const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "THB", currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 });
 
 export const DOWN_PAYMENT = { min: 10, max: 80, step: 5 } as const;
 
@@ -31,7 +32,23 @@ export function computeMetrics(listing: Pick<Listing, "price" | "rent">, downPay
   return { gross, yieldRate: grossYield(listing), cash, payback: gross > 0 ? cash / gross : Infinity };
 }
 
-// Width of the yield bar: 6.25% gross yield fills it.
+/** Gross yield, in percent, that fills the yield bar. */
+export const YIELD_BAR_FULL = 10;
+
+// Width of the yield bar in percent: YIELD_BAR_FULL (10% gross yield) fills it, clamped to 0–100.
 export function yieldBarWidth(yieldRate: number): number {
-  return Math.max(0, Math.min(yieldRate * 16, 100));
+  return Math.max(0, Math.min((yieldRate / YIELD_BAR_FULL) * 100, 100));
+}
+
+/** Snaps a typed down payment onto the slider's scale: clamped to min–max and rounded to the step. */
+export function snapDownPayment(value: number): number {
+  const { min, max, step } = DOWN_PAYMENT;
+  if (!Number.isFinite(value)) return min;
+  const snapped = min + Math.round((value - min) / step) * step;
+  return Math.max(min, Math.min(snapped, max));
+}
+
+/** True when a typed value can be used as is: a number on the slider's scale. */
+export function isDownPayment(value: number): boolean {
+  return Number.isFinite(value) && snapDownPayment(value) === value;
 }
