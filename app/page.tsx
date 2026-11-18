@@ -76,10 +76,6 @@ export default function Home() {
                 <li className="ds-row"><span className="ds-row-name">Gross payback</span><span className="ds-row-detail">initial cash ÷ annual gross rent</span><span className="ds-row-value">{metrics.payback.toFixed(1)} yrs</span></li>
               </ul>
             </div>
-            <div className="ds-callout" aria-live="polite">
-              <strong>{selected.name}</strong>
-              <span>{selected.district} · {selected.type} · {selected.area} m². {selected.note}</span>
-            </div>
           </section>
 
           <section className="ds-panel" aria-labelledby="listings-heading">
@@ -101,6 +97,12 @@ export default function Home() {
                 </li>
               ))}
             </ul>
+            {/* Under the list, so on phones the selection's details appear right where it was picked. */}
+            <div className="ds-callout" aria-live="polite">
+              <strong>{selected.name}</strong>
+              <span>{selected.district} · {selected.type} · {selected.area} m². {selected.note}</span>
+              <span>Gross yield {metrics.yieldRate.toFixed(2)}% · payback {metrics.payback.toFixed(1)} yrs on {downPayment}% down.</span>
+            </div>
           </section>
         </div>
 

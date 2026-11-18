@@ -53,6 +53,11 @@ describe("rental yield page", () => {
     expect(stats()[0]).toBe("Asking price฿6,750,000124 m²");
     expect(stats()[2]).toBe("Gross yield6.40%yearly rent ÷ price");
     expect(host.querySelector(".ds-callout")?.textContent).toContain("Commercial frontage; higher upkeep.");
+    // The details sit under the listings (not above them in the down-payment panel), with the key figures.
+    const callout = host.querySelector("#listings-heading")?.closest("section")?.querySelector(".ds-callout");
+    expect(callout?.previousElementSibling?.classList.contains("ds-rows")).toBe(true);
+    expect(callout?.textContent).toContain("Gross yield 6.40% · payback");
+    expect(host.querySelector("#scenario-heading")?.closest("section")?.querySelector(".ds-callout")).toBeNull();
   });
 
   it("moves the down payment and the payback follows", () => {
