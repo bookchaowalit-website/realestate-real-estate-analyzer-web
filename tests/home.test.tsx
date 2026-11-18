@@ -20,6 +20,7 @@ function setValue(input: HTMLInputElement, value: string) {
 }
 const slide = (value: number) => setValue(range(), String(value));
 const blur = (input: HTMLInputElement) => act(() => { input.dispatchEvent(new FocusEvent("focusout", { bubbles: true })); });
+const key = (input: HTMLInputElement, name: string) => act(() => { input.dispatchEvent(new KeyboardEvent("keydown", { key: name, bubbles: true })); });
 
 beforeEach(() => {
   host = document.createElement("div");
@@ -94,6 +95,22 @@ describe("rental yield page", () => {
     setValue(box(), "");
     blur(box());
     expect(box().value).toBe("80");
+  });
+
+  it("commits a typed down payment on Enter, snapped like on blur, and every figure follows", () => {
+    setValue(box(), "33");
+    expect(stats()[3]).toBe("Gross payback4.4yrson 30% down");
+    key(box(), "a");
+    expect(box().value).toBe("33");
+    key(box(), "Enter");
+    expect(box().value).toBe("35");
+    expect(range().value).toBe("35");
+    expect(host.querySelector("output")?.textContent).toBe("35%");
+    expect(stats()[3]).toBe("Gross payback5.1yrson 35% down");
+    expect(host.querySelector(".ds-rows .ds-row-detail")?.textContent).toBe("35% of ฿3,250,000");
+    setValue(box(), "");
+    key(box(), "Enter");
+    expect(box().value).toBe("35");
   });
 
   it("scales each yield bar to a full mark of 10%", () => {

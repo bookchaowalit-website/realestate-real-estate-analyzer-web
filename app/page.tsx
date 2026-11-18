@@ -11,6 +11,11 @@ export default function Home() {
   const [typed, setTyped] = useState<string | null>(null);
   const selected = findListing(selectedId);
   const metrics = useMemo(() => computeMetrics(selected, downPayment), [downPayment, selected]);
+  // Leaving the box or pressing Enter commits what was typed, snapped to the slider's steps.
+  const commitTyped = () => {
+    if (typed !== null && typed.trim() !== "") setDownPayment(snapDownPayment(Number(typed)));
+    setTyped(null);
+  };
 
   return (
     <div className="ds">
@@ -64,10 +69,8 @@ export default function Home() {
                     setTyped(value);
                     if (value !== "" && isDownPayment(Number(value))) setDownPayment(Number(value));
                   }}
-                  onBlur={() => {
-                    if (typed !== null && typed.trim() !== "") setDownPayment(snapDownPayment(Number(typed)));
-                    setTyped(null);
-                  }}
+                  onBlur={commitTyped}
+                  onKeyDown={(event) => { if (event.key === "Enter") commitTyped(); }}
                 />
               </label>
               <ul className="ds-rows">
