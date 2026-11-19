@@ -52,3 +52,4 @@ side by side.
 - Browser-only. All listings and figures are synthetic demonstration data.
 - Two tabs saving own listings at the same moment can still lose one save (last write wins).
 - If a save fails and another tab updates storage, the unsaved in-memory change is replaced by the other tab's data.
+- If the browser refuses to save (storage full), a removed own listing disappears from the page but may come back on reload; there is no separate notice for this.
