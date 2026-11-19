@@ -146,7 +146,8 @@ describe("rental yield page", () => {
   it("puts the listings before the down payment, so phones see the choice first", () => {
     const sections = [...host.querySelectorAll(".ds-grid > section")].map((section) => section.getAttribute("aria-labelledby"));
     expect(sections).toEqual(["listings-heading", "scenario-heading"]);
-    expect(host.querySelector(".ds-grid > section")?.classList.contains("ds-phone-first")).toBe(true);
+    // DOM order is the order on every screen (no CSS reordering), so Tab order matches what is seen.
+    expect(host.querySelector(".ds-phone-first")).toBeNull();
   });
 
   it("announces a listing change but not a down-payment move", () => {

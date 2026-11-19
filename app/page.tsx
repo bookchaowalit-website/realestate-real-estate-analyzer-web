@@ -107,7 +107,7 @@ export default function Home() {
         </ul>
 
         <div className="ds-grid">
-          <section className="ds-panel ds-phone-first" aria-labelledby="listings-heading">
+          <section className="ds-panel" aria-labelledby="listings-heading">
             <div className="ds-panel-head">
               <div>
                 <h2 id="listings-heading">Listings</h2>
