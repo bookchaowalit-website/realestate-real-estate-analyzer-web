@@ -2,3 +2,13 @@
 @import "./dashboard-shell.css";
 
 html, body { margin: 0; background: var(--ds-bg); }
+
+/* Add-your-listing form and the down-payment hint (app side; the shell has no error or hint styles). */
+.re-hint { color: var(--ds-muted); font-size: 13px; font-weight: 400; }
+.re-error { margin: 0; color: var(--ds-red); font-size: 13px; font-weight: 600; }
+.ds-input[aria-invalid="true"] { border: 2px solid var(--ds-red); }
+.re-empty { margin: 12px 0 0; color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
+.re-add { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--ds-line); }
+.re-add h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.re-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.re-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 16px; }

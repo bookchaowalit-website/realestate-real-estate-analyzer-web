@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeMetrics, findListing, grossYield, isDownPayment, listings, money, snapDownPayment, yieldBarWidth } from "@/lib/realestate";
+import { computeMetrics, downPaymentAdjustment, draftToListing, emptyDraft, findListing, grossYield, isDownPayment, listings, money, parseSaved, snapDownPayment, validateDraft, yieldBarWidth } from "@/lib/realestate";
 
 describe("listings", () => {
   it("holds four synthetic records and falls back to the first", () => {
@@ -44,9 +44,9 @@ describe("yieldBarWidth", () => {
 });
 
 describe("down payment input", () => {
-  it("snaps a typed value onto the slider's 10–80 scale in steps of 5", () => {
-    expect(snapDownPayment(33)).toBe(35);
-    expect(snapDownPayment(32)).toBe(30);
+  it("snaps a typed value onto the slider's 10–80 scale in whole percent", () => {
+    expect(snapDownPayment(33)).toBe(33);
+    expect(snapDownPayment(32.4)).toBe(32);
     expect(snapDownPayment(2)).toBe(10);
     expect(snapDownPayment(500)).toBe(80);
     expect(snapDownPayment(Number.NaN)).toBe(10);
@@ -54,9 +54,50 @@ describe("down payment input", () => {
 
   it("accepts only values already on the scale", () => {
     expect(isDownPayment(45)).toBe(true);
-    expect(isDownPayment(44)).toBe(false);
+    expect(isDownPayment(44)).toBe(true);
+    expect(isDownPayment(44.5)).toBe(false);
     expect(isDownPayment(5)).toBe(false);
     expect(isDownPayment(Number.NaN)).toBe(false);
+  });
+});
+
+describe("downPaymentAdjustment", () => {
+  it("explains a clamp or a rounding, and is null when the value was used", () => {
+    expect(downPaymentAdjustment(33, 33)).toBeNull();
+    expect(downPaymentAdjustment(Number.NaN, 10)).toBeNull();
+    expect(downPaymentAdjustment(5, 10)).toBe("Raised to 10%, the lowest this tool takes.");
+    expect(downPaymentAdjustment(90, 80)).toBe("Lowered to 80%, the highest this tool takes.");
+    expect(downPaymentAdjustment(33.4, 33)).toBe("Rounded to 33%, a whole percent.");
+  });
+});
+
+describe("own listings", () => {
+  const good = { name: " Ari Park ", price: "฿3,000,000", rent: "25000", area: "40" };
+  it("accepts a sensible draft and turns it into a listing", () => {
+    expect(validateDraft(good)).toEqual({});
+    expect(draftToListing(good, "own-1")).toMatchObject({ id: "own-1", own: true, name: "Ari Park", price: 3_000_000, rent: 25_000, area: 40 });
+  });
+
+  it("names each problem", () => {
+    expect(Object.keys(validateDraft(emptyDraft))).toEqual(["name", "price", "rent", "area"]);
+    expect(validateDraft({ ...good, name: "x".repeat(61) }).name).toBe("Keep the name to 60 characters or fewer.");
+    expect(validateDraft({ ...good, price: "50000" }).price).toContain("at least");
+    expect(validateDraft({ ...good, rent: "-5" }).rent).toContain("above ฿0");
+    expect(validateDraft({ ...good, area: "20000" }).area).toContain("between");
+  });
+
+  it("parses saved listings and drops anything malformed", () => {
+    expect(parseSaved(null)).toEqual([]);
+    expect(parseSaved("{bad")).toEqual([]);
+    expect(parseSaved("{}")).toEqual([]);
+    expect(parseSaved(JSON.stringify([null, { id: "a", name: "A", price: 1, rent: 0, area: 1 }, { id: "b", name: "B", price: 900000, rent: 5000, area: 20 }])).map((l) => l.id)).toEqual(["b"]);
+  });
+
+  it("finds a listing in a given list, falling back to its first", () => {
+    const mine = [draftToListing(good, "own-1")];
+    expect(findListing("own-1", [...listings, ...mine]).name).toBe("Ari Park");
+    expect(findListing("nope", mine).id).toBe("own-1");
+    expect(findListing("nope", []).id).toBe("river");
   });
 });
 
