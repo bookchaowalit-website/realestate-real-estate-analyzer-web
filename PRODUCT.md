@@ -50,3 +50,5 @@ side by side.
 ## Boundaries
 
 - Browser-only. All listings and figures are synthetic demonstration data.
+- Two tabs saving own listings at the same moment can still lose one save (last write wins).
+- If a save fails and another tab updates storage, the unsaved in-memory change is replaced by the other tab's data.
