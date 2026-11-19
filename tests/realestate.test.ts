@@ -104,6 +104,11 @@ describe("own listings", () => {
     expect(parseSaved(JSON.stringify([null, { id: "a", name: "A", price: 1, rent: 0, area: 1 }, { id: "b", name: "B", price: 900000, rent: 5000, area: 20 }])).map((l) => l.id)).toEqual(["b"]);
   });
 
+  it("keeps saved numbers exactly, including ones that do not round-trip as typed text", () => {
+    const [l] = parseSaved(JSON.stringify([{ id: "c", name: "C", price: 1e21, rent: 12.345, area: 0.5 }]));
+    expect([l.price, l.rent, l.area]).toEqual([1e21, 12.345, 0.5]);
+  });
+
   it("finds a listing in a given list, falling back to its first", () => {
     const mine = [draftToListing(good, "own-1")];
     expect(findListing("own-1", [...listings, ...mine]).name).toBe("Ari Park");

@@ -108,7 +108,7 @@ export function parseSaved(raw: string | null): Listing[] {
     return data.filter((item): item is Listing => {
       const l = item as Listing;
       return typeof l === "object" && l !== null && typeof l.id === "string" && typeof l.name === "string" && [l.price, l.rent, l.area].every((n) => typeof n === "number" && n > 0);
-    }).map((l) => draftToListing({ name: l.name, price: String(l.price), rent: String(l.rent), area: String(l.area) }, l.id));
+    }).map((l) => ({ id: l.id, own: true, district: "Your listing", name: l.name.trim(), type: "Added by you", price: l.price, rent: l.rent, area: l.area, note: "Figures you entered; kept only in this browser." }));
   } catch {
     return [];
   }

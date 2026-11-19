@@ -72,7 +72,7 @@ export default function Home() {
       form.current?.querySelector<HTMLInputElement>(`#add-${first.key}`)?.focus();
       return;
     }
-    const listing = draftToListing(draft, `own-${Date.now().toString(36)}`);
+    const listing = draftToListing(draft, `own-${typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`}`);
     setOwnListings((latest) => [...latest, listing]);
     setSelectedId(listing.id);
     setAnnouncement(`Added ${listing.name} and selected it: gross yield ${grossYield(listing).toFixed(1)}%.`);
