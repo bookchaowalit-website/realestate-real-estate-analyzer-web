@@ -5,7 +5,7 @@ import { DashFoot, DashTop, Pill, Stat } from "@/components/dashboard-shell";
 import { getServerSnapshot, getSnapshot, setOwnListings, subscribe } from "@/lib/own-listings";
 import {
   DOWN_PAYMENT, YIELD_BAR_FULL, type DraftErrors, type ListingDraft, computeMetrics, downPaymentAdjustment, draftToListing, emptyDraft,
-  findListing, grossYield, isDownPayment, listings as samples, money, snapDownPayment, validateDraft, yieldBarWidth,
+  exactMoney, findListing, grossYield, isDownPayment, listings as samples, money, snapDownPayment, validateDraft, yieldBarWidth,
 } from "@/lib/realestate";
 
 const FIELDS: { key: keyof ListingDraft; label: string; inputMode: "text" | "numeric" | "decimal"; placeholder: string }[] = [
@@ -100,8 +100,8 @@ export default function Home() {
         </div>
 
         <ul className="ds-stats" aria-label={`${selected.name} at a glance`}>
-          <Stat label="Asking price" value={money.format(selected.price)} note={`${selected.area} m²`} />
-          <Stat label="Monthly rent" value={money.format(selected.rent)} note="before any costs" />
+          <Stat label="Asking price" value={exactMoney.format(selected.price)} note={`${selected.area} m²`} />
+          <Stat label="Monthly rent" value={exactMoney.format(selected.rent)} note="before any costs" />
           <Stat label="Gross yield" value={`${metrics.yieldRate.toFixed(2)}%`} note="yearly rent ÷ price" />
           <Stat label="Gross payback" value={metrics.payback.toFixed(1)} unit="yrs" note={`on ${downPayment}% down`} />
         </ul>
@@ -216,8 +216,8 @@ export default function Home() {
                 <span id="down-payment-hint" className="re-hint">{adjusted ?? `Any whole number from ${DOWN_PAYMENT.min} to ${DOWN_PAYMENT.max}.`}</span>
               </div>
               <ul className="ds-rows">
-                <li className="ds-row"><span className="ds-row-name">Initial cash</span><span className="ds-row-detail">{downPayment}% of {money.format(selected.price)}</span><span className="ds-row-value">{money.format(metrics.cash)}</span></li>
-                <li className="ds-row"><span className="ds-row-name">Annual gross rent</span><span className="ds-row-detail">{money.format(selected.rent)} × 12</span><span className="ds-row-value">{money.format(metrics.gross)}</span></li>
+                <li className="ds-row"><span className="ds-row-name">Initial cash</span><span className="ds-row-detail">{downPayment}% of {exactMoney.format(selected.price)}</span><span className="ds-row-value">{money.format(metrics.cash)}</span></li>
+                <li className="ds-row"><span className="ds-row-name">Annual gross rent</span><span className="ds-row-detail">{exactMoney.format(selected.rent)} × 12</span><span className="ds-row-value">{money.format(metrics.gross)}</span></li>
                 <li className="ds-row"><span className="ds-row-name">Gross payback</span><span className="ds-row-detail">initial cash ÷ annual gross rent</span><span className="ds-row-value">{metrics.payback.toFixed(1)} yrs</span></li>
               </ul>
             </div>

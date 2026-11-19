@@ -11,6 +11,10 @@ export const listings: Listing[] = [
 
 // Thai baht with the ฿ sign (narrowSymbol), e.g. ฿3,250,000; the page copy stays English.
 export const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "THB", currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 });
+const satang = new Intl.NumberFormat("en-US", { style: "currency", currency: "THB", currencyDisplay: "narrowSymbol", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/** A figure the visitor typed (price, rent), shown with its satang when it has them, so "฿10,000.49 × 12" matches the
+ * total worked out from it; whole-baht figures still print without decimals. */
+export const exactMoney = { format: (value: number) => (Number.isInteger(value) ? money : satang).format(value) };
 
 // Whole percent steps, so the number box takes any value the slider can show.
 export const DOWN_PAYMENT = { min: 10, max: 80, step: 1 } as const;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeMetrics, downPaymentAdjustment, draftToListing, emptyDraft, findListing, grossYield, isDownPayment, listings, money, parseSaved, snapDownPayment, validateDraft, yieldBarWidth } from "@/lib/realestate";
+import { computeMetrics, exactMoney, downPaymentAdjustment, draftToListing, emptyDraft, findListing, grossYield, isDownPayment, listings, money, parseSaved, snapDownPayment, validateDraft, yieldBarWidth } from "@/lib/realestate";
 
 describe("listings", () => {
   it("holds four synthetic records and falls back to the first", () => {
@@ -118,6 +118,9 @@ describe("own listings", () => {
 });
 
 describe("money", () => {
+  it("prints typed figures with satang only when they have them", () => {
+    expect([exactMoney.format(18_500), exactMoney.format(10_000.49), exactMoney.format(10_000.5)]).toEqual(["฿18,500", "฿10,000.49", "฿10,000.50"]);
+  });
   it("formats baht with the ฿ sign and no decimals", () => {
     expect(money.format(3_250_000)).toBe("฿3,250,000");
     expect(money.format(18_500.4)).toBe("฿18,500");

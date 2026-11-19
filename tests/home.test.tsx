@@ -192,6 +192,20 @@ describe("rental yield page", () => {
     expect(host.querySelector(".re-empty")).toBeNull();
   });
 
+  it("shows a typed rent with its satang, so the rent × 12 line matches the annual total", () => {
+    press(button("Add your listing"));
+    setValue(field("name"), "Satang Flat");
+    setValue(field("price"), "2,000,000.50");
+    setValue(field("rent"), "10,000.49");
+    setValue(field("area"), "30");
+    submit();
+    const row = (name: string) => [...(scenario(".ds-rows")?.querySelectorAll(".ds-row") ?? [])].find((r) => r.querySelector(".ds-row-name")?.textContent === name);
+    // 10,000.49 × 12 = 120,005.88: the operand keeps its satang and the total rounds to whole baht.
+    expect([row("Annual gross rent")?.querySelector(".ds-row-detail")?.textContent, row("Annual gross rent")?.querySelector(".ds-row-value")?.textContent]).toEqual(["฿10,000.49 × 12", "฿120,006"]);
+    expect(row("Initial cash")?.querySelector(".ds-row-detail")?.textContent).toBe("30% of ฿2,000,000.50");
+    expect(stats().slice(0, 2)).toEqual(["Asking price฿2,000,000.5030 m²", "Monthly rent฿10,000.49before any costs"]);
+  });
+
   it("cancels the form and removes an added listing", () => {
     press(button("Add your listing"));
     press(button("Cancel"));
