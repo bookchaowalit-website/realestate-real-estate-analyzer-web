@@ -178,7 +178,7 @@ describe("rental yield page", () => {
     setValue(field("area"), "0");
     submit();
     expect(field("name").hasAttribute("aria-invalid")).toBe(false);
-    expect([...host.querySelectorAll(".re-error")].map(text)).toEqual(["Enter a price of at least ฿100,000, digits only.", "A year of rent is above the price; check both figures.", "Enter an area between 1 and 10,000 m²."]);
+    expect([...host.querySelectorAll(".re-error")].map(text)).toEqual(["Enter a price of at least ฿100,000, digits only.", "A year of rent is above the price; check both figures.", "Enter an area between 1 and 10,000 m², with a dot for decimals."]);
     setValue(field("price"), "3,000,000");
     setValue(field("rent"), "25,000");
     setValue(field("area"), "40");

@@ -26,6 +26,15 @@ side by side.
   investment recommendation.
 - No account, storage or sync; nothing survives a reload. No API route. No product analytics.
 
+## Known limits
+
+- A long unbroken listing name (up to 60 characters) can overflow the selected-listing header and callout at 320px;
+  only the list rows wrap it.
+- On a bad submit, focus moves to the first wrong field before React renders the new error, so a screen reader may
+  read the field without its error, and nothing is announced when focus is already on that field.
+- The down-payment percentage is shown in an `<output>`, whose implicit status role may announce the value again
+  while the slider itself announces it.
+
 ## Live URL and deploy state
 
 - Live: https://real-estate.bookchaowalit.com (HTTP 200 on 2026-10-23).

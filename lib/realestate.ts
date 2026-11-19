@@ -67,10 +67,13 @@ export type ListingDraft = { name: string; price: string; rent: string; area: st
 export type DraftErrors = Partial<Record<keyof ListingDraft, string>>;
 export const emptyDraft: ListingDraft = { name: "", price: "", rent: "", area: "" };
 
-// Accepts "3,250,000" or "3250000"; anything else is NaN.
+// Accepts "3250000", "3,250,000" or "3 250 000" (thousands groups of exactly three digits), an
+// optional ฿ in front and a dot for decimals. The format is checked before separators are dropped,
+// so a typo like "3,250,00" or "35,5" is refused instead of silently becoming another number.
 function amount(text: string): number {
-  const clean = text.replace(/[,\s฿]/g, "");
-  return /^\d+(\.\d+)?$/.test(clean) ? Number(clean) : Number.NaN;
+  const trimmed = text.trim().replace(/^฿\s*/, "");
+  const valid = /^(\d+|\d{1,3}(,\d{3})+|\d{1,3}( \d{3})+)(\.\d+)?$/.test(trimmed);
+  return valid ? Number(trimmed.replace(/[, ]/g, "")) : Number.NaN;
 }
 
 export function validateDraft(draft: ListingDraft): DraftErrors {
@@ -87,7 +90,7 @@ export function validateDraft(draft: ListingDraft): DraftErrors {
   else if (rent * 12 > price) errors.rent = "A year of rent is above the price; check both figures.";
   const area = amount(draft.area);
   if (!draft.area.trim()) errors.area = "Enter the floor area in m².";
-  else if (!(area > 0 && area <= 10_000)) errors.area = "Enter an area between 1 and 10,000 m².";
+  else if (!(area > 0 && area <= 10_000)) errors.area = "Enter an area between 1 and 10,000 m², with a dot for decimals.";
   return errors;
 }
 

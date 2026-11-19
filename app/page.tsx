@@ -73,14 +73,14 @@ export default function Home() {
       return;
     }
     const listing = draftToListing(draft, `own-${Date.now().toString(36)}`);
-    setOwnListings([...own.listings, listing]);
+    setOwnListings((latest) => [...latest, listing]);
     setSelectedId(listing.id);
     setAnnouncement(`Added ${listing.name} and selected it: gross yield ${grossYield(listing).toFixed(1)}%.`);
     closeForm();
   };
   const remove = () => {
-    const name = selected.name;
-    setOwnListings(own.listings.filter((listing) => listing.id !== selected.id));
+    const { name, id } = selected;
+    setOwnListings((latest) => latest.filter((listing) => listing.id !== id));
     setSelectedId(samples[0].id);
     setAnnouncement(`Removed ${name}. ${samples[0].name} selected.`);
     requestAnimationFrame(() => addButton.current?.focus());

@@ -86,6 +86,17 @@ describe("own listings", () => {
     expect(validateDraft({ ...good, area: "20000" }).area).toContain("between");
   });
 
+  it("checks the number format before dropping thousands separators", () => {
+    for (const bad of ["3,250,00", "1,2,3", "1.2.3", "35,5", ",100000", "100000,"]) {
+      expect(validateDraft({ ...good, price: bad }).price, bad).toBeDefined();
+    }
+    expect(validateDraft({ ...good, area: "35,5" }).area).toBeDefined();
+    expect(validateDraft({ ...good, price: "3,250,000" })).toEqual({});
+    expect(validateDraft({ ...good, price: " ฿ 3 250 000 " })).toEqual({});
+    expect(validateDraft({ ...good, area: "35.5" })).toEqual({});
+    expect(draftToListing({ ...good, price: "1,250,000.50" }, "x").price).toBe(1_250_000.5);
+  });
+
   it("parses saved listings and drops anything malformed", () => {
     expect(parseSaved(null)).toEqual([]);
     expect(parseSaved("{bad")).toEqual([]);
